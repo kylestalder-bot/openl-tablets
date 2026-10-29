@@ -30,7 +30,7 @@ RELEASES_URL="https://github.com/openl-tablets/openl-tablets/releases/download"
 JAVA_MAJOR_VERSION="25"
 JETTY_VERSION="12.1.14"
 # Node.js runs the MCP server built into OpenL Studio
-NODE_VERSION="v24.21.0"
+NODE_VERSION="v24.22.2"
 
 # JDBC Driver Versions
 POSTGRES_VERSION="42.7.14"

@@ -225,8 +225,8 @@
         <jacoco.version>0.8.15</jacoco.version>
 
         <frontend-maven-plugin.version>2.0.2</frontend-maven-plugin.version>
-        <node.version>v24.21.0</node.version>
-        <npm.version>12.0.2</npm.version>
+        <node.version>v24.22.2</node.version>
+        <npm.version>12.2.1</npm.version>
         <npm.test.skip>false</npm.test.skip>
         <npm.typecheck.skip>false</npm.typecheck.skip>
         <npm.lint.skip>false</npm.lint.skip>
