@@ -44,14 +44,20 @@ jobs:
           git config --global core.autocrlf false
 
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Determine the latest version
+        env:
+          INPUT_VERSION: ${{ github.event.inputs.version }}
         run: |
           metaUrl="$SERVER/org/openl/org.openl.commons/maven-metadata.xml"
           metaData="$(wget -qO - $metaUrl)"
           latest="$(echo $metaData | xmllint --xpath /metadata/versioning/latest/text\(\) - )"
-          version="${{ github.event.inputs.version }}"
+          version="${INPUT_VERSION:-latest}"
+          if ! [[ "$version" =~ ^(latest|[0-9A-Za-z._-]+)$ ]]; then
+            echo "Invalid version: $version" >&2
+            exit 1
+          fi
           if [ "$version" = "latest" ]; then
             version="$latest"
           fi
@@ -89,13 +95,20 @@ jobs:
           gpg --batch --verify openl-rules-opentelemetry.jar.asc openl-rules-opentelemetry.jar
           rm openl-rules-opentelemetry.jar.asc
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          username: ${{ secrets.DOCKER_LOGIN }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
       - name: Prepare for multi-platform docker build
         run: |
           echo "BUILD_PLATFORMS=linux/amd64,linux/arm64/v8" >> $GITHUB_ENV
           echo "BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_ENV
-          docker run --privileged --rm tonistiigi/binfmt --install all
           docker buildx create --use
-          docker login -u ${{ secrets.DOCKER_LOGIN }} -p ${{ secrets.DOCKER_TOKEN }}
 
       - name: Push Rule Services (All)
         env:

@@ -20,6 +20,7 @@ jobs:
     name: Deploy
 
     permissions:
+      contents: read
       packages: write
 
     runs-on: ubuntu-latest
@@ -33,12 +34,12 @@ jobs:
           git config --global core.autocrlf false
 
       - name: Checkout ${{ github.event.inputs.branch }}
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.inputs.branch }}
 
       - name: Setup Java and cache
-        uses: actions/setup-java@v6
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           distribution: 'temurin'
           java-version: 25
@@ -55,10 +56,12 @@ jobs:
           TAG_VERSION=${VERSION/-SNAPSHOT/-$COMMIT_HASH}
           echo "TAG_VERSION=${TAG_VERSION}" >> $GITHUB_ENV
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
+
       - name: Prepare for multi-platform docker build
         run: |
           echo "BUILD_PLATFORMS=linux/amd64,linux/arm64/v8" >> $GITHUB_ENV
-          docker run --privileged --rm tonistiigi/binfmt --install all
           docker buildx create --use
 
       - name: Build docker images ${{ env.TAG_VERSION }}
@@ -95,14 +98,14 @@ jobs:
           echo '`docker run -p 8080:8080 ghcr.io/${{ github.repository_owner }}/ws:${{ env.TAG_VERSION }}-all`' >> $GITHUB_STEP_SUMMARY
 
       - name: Clean up old versions of RuleServices
-        uses: actions/delete-package-versions@v5
+        uses: actions/delete-package-versions@e5bc658cc4c965c472efe991f8beea3981499c55 # v5.0.0
         with:
           package-name: 'ws'
           package-type: 'container'
           min-versions-to-keep: 50 # 5 versions * 2 variants * 5 manifests
 
       - name: Clean up old versions of Studio
-        uses: actions/delete-package-versions@v5
+        uses: actions/delete-package-versions@e5bc658cc4c965c472efe991f8beea3981499c55 # v5.0.0
         with:
           package-name: 'webstudio'
           package-type: 'container'

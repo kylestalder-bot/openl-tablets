@@ -8,7 +8,7 @@ services:
     container_name: studio
     ports:
       - "8080:8080" # HTTP
-      - "5005:5005" # Debug port
+      - "127.0.0.1:5005:5005" # Debug port
     deploy:
       resources:
         limits:
@@ -36,7 +36,7 @@ services:
     container_name: services
     ports:
       - "8081:8080" # HTTP
-      - "5006:5005" # Debug port
+      - "127.0.0.1:5006:5005" # Debug port
     deploy:
       resources:
         limits:
@@ -98,7 +98,7 @@ services:
       timeout: 5s
       retries: 10
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     deploy:
       resources:
         limits:
